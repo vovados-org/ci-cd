@@ -12,6 +12,13 @@
 
 # testing
 /coverage
+.nyc_output
+
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+cypress/results/
+cypress/reports/
 
 # next.js
 /.next/
@@ -30,7 +37,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+.env.local
+.env
 
 # vercel
 .vercel
@@ -38,3 +46,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+

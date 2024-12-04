@@ -3,32 +3,54 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "start": "next start",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "prepare": "husky"
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run",
+    "test:e2e": "cypress run --env coverage=false",
+    "test:coverage": "vitest run --coverage && cypress run && npm run coverage:merge && npm run coverage:report",
+    "coverage:report": "nyc report --reporter=text-summary",
+    "coverage:merge": "nyc merge ./coverage ./coverage/coverage.json"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106"
+    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.13.8",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vercel/style-guide": "^6.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "2.1.8",
+    "cypress": "^13.16.0",
+    "dotenv": "^16.4.7",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.1",
     "husky": "^9.1.7",
+    "istanbul-lib-coverage": "^3.2.2",
+    "jsdom": "^25.0.1",
+    "nyc": "^17.1.0",
     "postcss": "^8",
     "prettier": "^3.4.1",
     "prettier-plugin-tailwindcss": "^0.6.9",
+    "swc-plugin-coverage-instrument": "^0.0.25",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^5.1.3",
+    "vitest": "^2.1.8"
   }
 }

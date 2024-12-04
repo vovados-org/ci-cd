@@ -1,7 +1,18 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  output: "standalone",
+  experimental: {
+    swcPlugins: [
+      [
+        "swc-plugin-coverage-instrument",
+        {
+          compact: true,
+          unstableExclude: ["**/node_modules/**/*"],
+        },
+      ],
+    ],
+  },
+}
 
-export default nextConfig;
+export default nextConfig

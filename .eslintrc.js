@@ -19,7 +19,11 @@ module.exports = {
     "no-nested-ternary": "off",
     "react/hook-use-state": "off",
     "react/no-array-index-key": "off",
+    "react/button-has-type": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-require-imports": "off",
@@ -46,5 +50,10 @@ module.exports = {
   },
   parserOptions: {
     project: true,
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {},
+    },
   },
 }
