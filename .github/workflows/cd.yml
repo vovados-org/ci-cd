@@ -1,0 +1,22 @@
+name: CD
+
+on:
+  pull_request:
+    branches: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            docker pull ${{ vars.REGISTRY }}/${{ vars.IMAGE_NAME }}:latest
+            docker compose down
+            docker compose up -d
