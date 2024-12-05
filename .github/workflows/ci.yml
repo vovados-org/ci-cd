@@ -41,4 +41,4 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          tags: ${{ vars.REGISTRY }}/${{ vars.IMAGE_NAME }}:latest
+          tags: ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:latest
