@@ -6,6 +6,7 @@ dotenv.config({ path: ".env.development" })
 
 export default defineConfig({
   env: {
+    coverage: String(process.env.CYPRESS_COVERAGE) === "true",
     codeCoverage: {
       url: String(process.env.CYPRESS_COVERAGE_API_URL),
     },
