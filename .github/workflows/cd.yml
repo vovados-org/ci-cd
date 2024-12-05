@@ -1,8 +1,8 @@
 name: CD
 
 on:
-  pull_request:
-    branches: [push]
+  push:
+    branches: [main]
 
 jobs:
   deploy:
