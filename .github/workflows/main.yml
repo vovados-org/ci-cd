@@ -28,16 +28,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run tests with coverage
+      - name: Run tests and validate coverage
         run: pnpm run test:coverage
-
-      - name: Check coverage threshold
-        run: |
-          COVERAGE=$(npm run test:coverage | grep "All files" | awk '{print $4}' | sed 's/%//')
-          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-            echo "Test coverage ($COVERAGE%) is below 80%"
-            exit 1
-          fi
 
       - name: Log in to registry
         uses: docker/login-action@v3

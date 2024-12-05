@@ -12,7 +12,7 @@
     "test:unit": "vitest run",
     "test:e2e": "start-server-and-test dev http://localhost:3000 \"cypress run\"",
     "test:coverage": "vitest run --coverage && cross-env CYPRESS_COVERAGE=true npm run test:e2e && npm run coverage:merge && npm run coverage:report",
-    "coverage:report": "nyc report --reporter=text-summary",
+    "coverage:report": "nyc report --nycrc-path=./.nycrc",
     "coverage:merge": "nyc merge ./coverage ./coverage/coverage.json"
   },
   "dependencies": {
