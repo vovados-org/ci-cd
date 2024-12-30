@@ -10,6 +10,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      sha: ${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v4
