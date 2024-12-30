@@ -1,15 +1,15 @@
-name: CD
+name: CD - Production Deployment
 
 on:
-  push:
-    branches: [main]
+  repository_dispatch:
+    types: [approve_production_deploy]
 
 jobs:
-  deploy-preview:
+  deploy-production:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy preview version
+      - name: Deploy to production environment
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -18,22 +18,23 @@ jobs:
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            docker pull ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
-            docker compose down preview
-            docker compose up preview -d
-            
-      - name: Send Slack notification for production approval
+            docker pull ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.event.client_payload.sha }}
+            docker compose down production
+            docker compose up production -d
+
+      - name: Update Slack notification about successful production deployment
         uses: slackapi/slack-github-action@v2.0.0
         with:
-          method: chat.postMessage
+          method: chat.update
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
             channel: ${{ secrets.SLACK_CHANNEL_ID }}
+            ts: "${{ steps.slack.outputs.ts }}"
             blocks:
               - type: "header"
                 text:
                   type: "plain_text"
-                  text: "New release request"
+                  text: "Release deployed to production"
 
               - type: "section"
                 fields:
@@ -43,21 +44,3 @@ jobs:
                     text: "*Created by:*\n<${{ github.event.pusher.email }}|${{ github.event.pusher.name }}>"
                   - type: "mrkdwn"
                     text: "*When:*\n${{ github.event.head_commit.timestamp }}"
-
-              - type: "actions"
-                elements:
-                  - type: "button"
-                    text:
-                      type: "plain_text"
-                      text: "Approve"
-                    style: "primary"
-                    value: "${{ github.sha }}"
-                    action_id: "approve_production_deploy"
-
-                  - type: "button"
-                    text: 
-                      type: "plain_text"
-                      text: "Reject"
-                    style: "danger"
-                    value: "${{ github.sha }}"
-                    action_id: "reject_production_deploy"

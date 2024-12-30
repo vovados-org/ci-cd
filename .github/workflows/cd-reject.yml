@@ -1,0 +1,74 @@
+name: CD - Reject and Revert
+
+on:
+  repository_dispatch:
+    types: [reject_production_deploy]
+
+jobs:
+  revert-main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Revert main to previous commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git revert --no-commit ${{ github.event.client_payload.sha }}
+          git commit -m "Revert main to previous commit due to rejection"
+          git push origin main
+
+      - uses: docker/setup-buildx-action@v3
+        name: Set up Docker Buildx
+
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Delete rejected Docker image and redeploy preview
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+            # Delete the rejected Docker image
+            docker rmi ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.event.client_payload.sha }}
+
+            # Pull the image with the reverted commit SHA
+            docker pull ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.event.client_payload.prev_sha }}
+            
+            docker compose -f docker-compose.preview.yml down
+            docker compose -f docker-compose.preview.yml up -d
+
+      - name: Update Slack notification about rejection
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.update
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: ${{ secrets.SLACK_CHANNEL_ID }}
+            ts: "${{ steps.slack.outputs.ts }}"
+            blocks:
+              - type: "header"
+                text:
+                  type: "plain_text"
+                  text: "Release rejected and reverted"
+
+              - type: "section"
+                fields:
+                  - type: "mrkdwn"
+                    text: "*Commit ID:*\${{ github.sha }}"
+                  - type: "mrkdwn"
+                    text: "*Created by:*\n<${{ github.event.pusher.email }}|${{ github.event.pusher.name }}>"
+                  - type: "mrkdwn"
+                    text: "*When:*\n${{ github.event.head_commit.timestamp }}"
