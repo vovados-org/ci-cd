@@ -84,10 +84,10 @@ jobs:
                       text:
                         type: "plain_text"
                         text: "By rejecting this release preview is going to be returned to the latest release"
+                      style: "danger"
                       confirm:
                         type: "plain_text"
                         text: "Reject"
-                        style: "danger"
                       deny:
                         type: "plain_text"
                         text: "Close"
