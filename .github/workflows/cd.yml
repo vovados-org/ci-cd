@@ -17,8 +17,9 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
+            cd ./krustberry.xyz
             export PREVIEW_IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ needs.ci.outputs.sha }}
-            docker compose down preview
+            docker compose -f down preview
             docker compose up preview -d
             
       - name: Send Slack notification for production approval
