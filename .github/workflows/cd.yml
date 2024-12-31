@@ -42,9 +42,11 @@ jobs:
                   - type: "mrkdwn"
                     text: "*Commit ID:*\n${{ github.event.pull_request.head.sha }}"
                   - type: "mrkdwn"
-                    text: "*Merged by:*\n<${{ github.event.pull_request.merged_by.url }}|@${{ github.event.pull_request.merged_by.login }}>"
+                    text: "*When:*\n${{ github.event.pull_request.merged_at }}"
                   - type: "mrkdwn"
-                    text: "\n*When:*\n${{ github.event.pull_request.merged_at }}"
+                    text: "*Created by:*\n<${{ github.event.pull_request.user.html_url }}|@${{ github.event.pull_request.user.login }}>"
+                  - type: "mrkdwn"
+                    text: "*Merged by:*\n<${{ github.event.pull_request.merged_by.html_url }}|@${{ github.event.pull_request.merged_by.login }}>"
               - type: "divider"
               - type: "actions"
                 elements:
