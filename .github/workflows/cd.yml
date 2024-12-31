@@ -31,18 +31,14 @@ jobs:
           payload: |
             channel: ${{ secrets.SLACK_CHANNEL_ID }}
             blocks:
-              - type: "header"
-                text: "New release request"
-
               - type: "section"
                 fields:
                   - type: "mrkdwn"
-                    text: "*Commit ID:*\${{ github.event.pull_request.head.sha }}"
+                    text: "*Commit ID:*\n${{ github.event.pull_request.head.sha }}"
                   - type: "mrkdwn"
                     text: "*Created by:*\n<${{ github.event.pull_request.head.user.name }} | @${{ github.event.pull_request.head.user.login }}>"
                   - type: "mrkdwn"
                     text: "*When:*\n${{ github.event.pull_request.merged_at }}"
-
               - type: "actions"
                 elements:
                   - type: "button"
@@ -52,9 +48,8 @@ jobs:
                     style: "primary"
                     value: "${{ github.event.pull_request.head.sha }}"
                     action_id: "approve_production_deploy"
-
                   - type: "button"
-                    text: 
+                    text:
                       type: "plain_text"
                       text: "Reject"
                     style: "danger"
