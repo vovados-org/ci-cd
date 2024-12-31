@@ -21,7 +21,7 @@ jobs:
             cd ./krustberry.xyz
             export PREVIEW_IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
             docker compose down preview
-            docker compose up preview -d
+            docker compose up traefik preview -d --no-recreate
             
       - name: Send Slack notification for production approval
         uses: slackapi/slack-github-action@v2.0.0
@@ -32,18 +32,16 @@ jobs:
             channel: ${{ secrets.SLACK_CHANNEL_ID }}
             blocks:
               - type: "header"
-                text:
-                  type: "plain_text"
-                  text: "New release request"
+                text: "New release request"
 
               - type: "section"
                 fields:
                   - type: "mrkdwn"
-                    text: "*Commit ID:*\${{ needs.ci.outputs.sha }}"
+                    text: "*Commit ID:*\${{ github.event.pull_request.head.sha }}"
                   - type: "mrkdwn"
-                    text: "*Created by:*\n<${{ github.event.pusher.email }}|${{ github.event.pusher.name }}>"
+                    text: "*Created by:*\n<${{ github.event.pull_request.head.user.name }} | @${{ github.event.pull_request.head.user.login }}>"
                   - type: "mrkdwn"
-                    text: "*When:*\n${{ github.event.head_commit.timestamp }}"
+                    text: "*When:*\n${{ github.event.pull_request.merged_at }}"
 
               - type: "actions"
                 elements:
@@ -52,7 +50,7 @@ jobs:
                       type: "plain_text"
                       text: "Approve"
                     style: "primary"
-                    value: "${{ needs.ci.outputs.sha }}"
+                    value: "${{ github.event.pull_request.head.sha }}"
                     action_id: "approve_production_deploy"
 
                   - type: "button"
@@ -60,5 +58,5 @@ jobs:
                       type: "plain_text"
                       text: "Reject"
                     style: "danger"
-                    value: "${{ needs.ci.outputs.sha }}"
+                    value: "${{ github.event.pull_request.head.sha }}"
                     action_id: "reject_production_deploy"
