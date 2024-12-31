@@ -40,11 +40,12 @@ jobs:
               - type: "section"
                 fields:
                   - type: "mrkdwn"
-                    text: "*Commit ID:*\n${{ github.event.pull_request.head.sha }}"
+                    text: "*Commit ID:*\n${{ github.event.pull_request.head.sha }}\n"
                   - type: "mrkdwn"
-                    text: "*Merged by:*\n<${{ github.event.pull_request.merged_by.name }} | @${{ github.event.pull_request.merged_by.login }}>"
+                    text: "*Merged by:*\n<${{ github.event.pull_request.merged_by.email }} | [@${{ github.event.pull_request.merged_by.login }}](${{ github.event.pull_request.merged_by.url }})>\n"
                   - type: "mrkdwn"
                     text: "\n*When:*\n${{ github.event.pull_request.merged_at }}"
+              - type: "divider"
               - type: "actions"
                 elements:
                   - type: "button"
@@ -61,4 +62,3 @@ jobs:
                     style: "danger"
                     value: "${{ github.event.pull_request.head.sha }}"
                     action_id: "reject_production_deploy"
-              - type: "divider"
