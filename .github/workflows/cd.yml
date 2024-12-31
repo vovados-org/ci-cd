@@ -30,16 +30,21 @@ jobs:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
             channel: ${{ secrets.SLACK_CHANNEL_ID }}
-            text: "New release"
+            text: "New release request"
             blocks:
+              - type: "header"
+                text:
+                  type: "plain_text"
+                  text: "New release request"
+              - type: "divider"
               - type: "section"
                 fields:
                   - type: "mrkdwn"
                     text: "*Commit ID:*\n${{ github.event.pull_request.head.sha }}"
                   - type: "mrkdwn"
-                    text: "*Created by:*\n<${{ github.event.pull_request.head.user.name }} | @${{ github.event.pull_request.head.user.login }}>"
+                    text: "*Merged by:*\n<${{ github.event.pull_request.merged_by.name }} | @${{ github.event.pull_request.merged_by.login }}>"
                   - type: "mrkdwn"
-                    text: "*When:*\n${{ github.event.pull_request.merged_at }}"
+                    text: "\n*When:*\n${{ github.event.pull_request.merged_at }}"
               - type: "actions"
                 elements:
                   - type: "button"
@@ -56,3 +61,4 @@ jobs:
                     style: "danger"
                     value: "${{ github.event.pull_request.head.sha }}"
                     action_id: "reject_production_deploy"
+              - type: "divider"
