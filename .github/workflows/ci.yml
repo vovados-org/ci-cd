@@ -10,8 +10,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      sha: ${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v4
@@ -30,4 +28,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
+          tags: ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
