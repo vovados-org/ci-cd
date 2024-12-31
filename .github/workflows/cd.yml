@@ -54,13 +54,40 @@ jobs:
                     text:
                       type: "plain_text"
                       text: "Approve"
-                    style: "primary"
-                    value: "${{ github.event.pull_request.head.sha }}"
                     action_id: "approve_production_deploy"
+                    value: "${{ github.event.pull_request.head.sha }}"
+                    style: "primary"
+                    confirm:
+                      title:
+                        type: "plain_text"
+                        text: "Are you sure?"
+                      text:
+                        type: "plain_text"
+                        text: "Release the version to production? Action cannot be undone unless reverted manually"
+                      confirm:
+                        type: "plain_text"
+                        text: "Release"
+                      deny:
+                        type: "plain_text"
+                        text: "Close"
                   - type: "button"
                     text:
                       type: "plain_text"
                       text: "Reject"
-                    style: "danger"
-                    value: "${{ github.event.pull_request.head.sha }}"
                     action_id: "reject_production_deploy"
+                    value: "${{ github.event.pull_request.head.sha }}"
+                    style: "danger"
+                    confirm:
+                      title:
+                        type: "plain_text"
+                        text: "Are you sure?"
+                      text:
+                        type: "plain_text"
+                        text: "By rejecting this release preview is going to be returned to the latest release"
+                      confirm:
+                        type: "plain_text"
+                        text: "Reject"
+                        style: "danger"
+                      deny:
+                        type: "plain_text"
+                        text: "Close"
