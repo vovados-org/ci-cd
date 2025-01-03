@@ -1,8 +1,6 @@
 name: CD - Reject and Revert
 
-on:
-  repository_dispatch:
-    types: [reject_production_deploy]
+on: workflow_dispatch
 
 jobs:
   revert-main:
