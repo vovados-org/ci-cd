@@ -56,7 +56,7 @@ jobs:
                       text: "Approve"
                     action_id: "approve_production_deploy"
                     value: "${{ github.event.pull_request.head.sha }}"
-                    url: https://oth1vnytq5.execute-api.us-east-2.amazonaws.com/api/approve
+                    url: "https://oth1vnytq5.execute-api.us-east-2.amazonaws.com/api/approve"
                     style: "primary"
                     confirm:
                       title:
@@ -76,6 +76,7 @@ jobs:
                       type: "plain_text"
                       text: "Reject"
                     action_id: "reject_production_deploy"
+                    url: "https://google.com"
                     value: "${{ github.event.pull_request.head.sha }}"
                     style: "danger"
                     confirm:
