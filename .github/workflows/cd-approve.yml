@@ -1,8 +1,6 @@
 name: CD - Production Deployment
 
-on:
-  repository_dispatch:
-    types: [approve_production_deploy]
+on: workflow_dispatch
 
 jobs:
   deploy-production:
