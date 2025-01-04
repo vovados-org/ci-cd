@@ -27,14 +27,15 @@ jobs:
           ref: main
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Revert main to previous commit
+      - name: Create revert PR
         run: |
           # Configure git
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
           
           # Create a new branch for the revert
-          BRANCH_NAME="revert-${inputs.sha:0:7}"
+          SHORT_SHA=$(echo ${{ inputs.sha }} | cut -c1-7)
+          BRANCH_NAME="revert-${SHORT_SHA}"
           git checkout -b $BRANCH_NAME
           
           # Create the revert commit
@@ -48,7 +49,7 @@ jobs:
           gh pr create \
             --base main \
             --head $BRANCH_NAME \
-            --title "Revert rejected release ${{ inputs.sha }}" \
+            --title "Revert rejected release ${SHORT_SHA}" \
             --body "Automatically created revert PR for rejected release." \
             --label "automated-revert"
 
@@ -81,4 +82,4 @@ jobs:
           payload: |
             channel: ${{ secrets.SLACK_CHANNEL_ID }}
             ts: "${{ inputs.ts }}"
-            text: "⛔️ Release has been rejected"
+            text: "⛔️ Release has been rejected. A revert PR has been created."
