@@ -15,7 +15,6 @@ on:
 jobs:
   deploy-production:
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy production version
         uses: appleboy/ssh-action@master
@@ -39,3 +38,12 @@ jobs:
             channel: ${{ secrets.SLACK_CHANNEL_ID }}
             ts: "${{ inputs.ts }}"
             text: "✅ Release has been deployed to production"
+
+      - name: Send Slack notification about the new release
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: ${{ vars.SLACK_RELEASES_CHANNEL_ID }}
+            text: "🎉 New version has been released"

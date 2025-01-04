@@ -8,7 +8,6 @@ on:
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy preview version
         uses: appleboy/ssh-action@master
@@ -29,7 +28,7 @@ jobs:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
-            channel: ${{ secrets.SLACK_CHANNEL_ID }}
+            channel: ${{ vars.SLACK_APPROVAL_CHANNEL_ID }}
             text: "New release request"
             blocks:
               - type: "header"
