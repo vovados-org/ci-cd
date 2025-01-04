@@ -55,7 +55,7 @@ jobs:
                   - type: "rich_text_quote"
                     elements:
                       - type: "text"
-                        text: "Please notice it might take a moment to complete the action. Message will be updated once it's done."
+                        text: "Please notice it might take a moment to complete the action. Message will be updated once the action is done."
               - type: "actions"
                 elements:
                   - type: "button"

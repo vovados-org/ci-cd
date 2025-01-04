@@ -2,15 +2,11 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
     types: [opened]
 
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - uses: actions/checkout@v4

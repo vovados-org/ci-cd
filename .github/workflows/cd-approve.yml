@@ -1,4 +1,4 @@
-name: CD - Production Deployment
+name: CD - Release Approval
 
 on:
   workflow_dispatch:
@@ -38,8 +38,4 @@ jobs:
           payload: |
             channel: ${{ secrets.SLACK_CHANNEL_ID }}
             ts: "${{ inputs.ts }}"
-            blocks:
-              - type: "header"
-                text:
-                  type: "plain_text"
-                  text: "Release has been deployed to production"
+            text: "✅ Release has been deployed to production"
