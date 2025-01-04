@@ -17,25 +17,40 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Revert main to previous commit
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git revert --no-commit ${{ inputs.sha }}
-          git commit -m "Revert main to previous commit due to rejection"
-          git push origin main
-
-      - name: Get latest commit hash
-        id: get_hash
-        run: echo "LATEST_HASH=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          # Configure git
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          
+          # Create a new branch for the revert
+          BRANCH_NAME="revert-${inputs.sha:0:7}"
+          git checkout -b $BRANCH_NAME
+          
+          # Create the revert commit
+          git revert --no-edit ${{ inputs.sha }}
+          
+          # Push the branch
+          git push origin $BRANCH_NAME
+          
+          # Create PR using GitHub CLI
+          gh auth login --with-token <<< "${{ secrets.GH_TOKEN }}"
+          gh pr create \
+            --base main \
+            --head $BRANCH_NAME \
+            --title "Revert rejected release ${{ inputs.sha }}" \
+            --body "Automatically created revert PR for rejected release." \
+            --label "automated-revert"
 
       - uses: docker/setup-buildx-action@v3
         name: Set up Docker Buildx
