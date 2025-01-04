@@ -1,6 +1,16 @@
 name: CD - Production Deployment
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        type: "string"
+        description: "Commit ID"
+        required: true
+      ts:
+        type: "string"
+        description: "Slack Message ID"
+        required: true
 
 jobs:
   deploy-production:
