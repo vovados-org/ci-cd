@@ -54,7 +54,7 @@ jobs:
 
             # Reverting preview to the latest released version
             cd ./krustberry.xyz
-            export PREVIEW_IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ steps.get_hash.outputs.LATEST_HASH }}
+            export PREVIEW_IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:latest
             docker compose down preview
             docker compose up traefik preview -d --no-recreate
 
