@@ -43,11 +43,19 @@ jobs:
                     text: "*Commit ID:*\n${{ github.event.pull_request.head.sha }}"
                   - type: "mrkdwn"
                     text: "*When:*\n${{ github.event.pull_request.merged_at }}"
+              - type: "section"
+                fields:
                   - type: "mrkdwn"
                     text: "*Created by:*\n<${{ github.event.pull_request.user.html_url }}|@${{ github.event.pull_request.user.login }}>"
                   - type: "mrkdwn"
                     text: "*Merged by:*\n<${{ github.event.pull_request.merged_by.html_url }}|@${{ github.event.pull_request.merged_by.login }}>"
               - type: "divider"
+              - type: "rich_text"
+                elements:
+                  - type: "rich_text_quote"
+                    elements:
+                      - type: "text"
+                        text: "Please notice it might take a moment to complete the action. Message will be updated once it's done."
               - type: "actions"
                 elements:
                   - type: "button"

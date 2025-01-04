@@ -7,18 +7,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Deploy to production environment
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.VPS_HOST }}
-      #     username: ${{ secrets.VPS_USERNAME }}
-      #     key: ${{ secrets.VPS_SSH_KEY }}
-      #     passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-      #     script: |
-      #       cd ./krustberry.xyz
-      #       export PREVIEW_IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.event.client_payload.sha }}
-      #       docker compose down production
-      #       docker compose up production -d
+      - name: Deploy to production environment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            cd ./krustberry.xyz
+            export PREVIEW_IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ inputs.sha }}
+            docker compose down production
+            docker compose up production -d
 
       - name: Update Slack notification about successful production deployment
         uses: slackapi/slack-github-action@v2.0.0
@@ -32,4 +32,4 @@ jobs:
               - type: "header"
                 text:
                   type: "plain_text"
-                  text: "Release deployed to production"
+                  text: "Release has been deployed to production"
