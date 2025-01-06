@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
     branches: [main]
-    types: [opened, edited]
+    types: [opened, reopened, edited]
 
 jobs:
   test-and-build:
@@ -75,7 +75,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
+          tags: ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 

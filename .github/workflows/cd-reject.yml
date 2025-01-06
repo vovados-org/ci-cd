@@ -65,11 +65,11 @@ jobs:
           script: |
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             # Delete the rejected Docker image
-            docker rmi ${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ inputs.sha }}
+            docker rmi ${{ vars.IMAGE_NAME }}:${{ inputs.sha }}
 
             # Reverting preview to the latest released version
             cd ./krustberry.xyz
-            export PREVIEW_IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ vars.IMAGE_NAME }}:latest
+            export PREVIEW_IMAGE=${{ vars.IMAGE_NAME }}:latest
             docker compose down preview
             docker compose up traefik preview -d --no-recreate
 
