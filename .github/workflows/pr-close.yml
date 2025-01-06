@@ -6,7 +6,7 @@ on:
     types: [closed]
 
 jobs:
-  removed-docker-image:
+  remove-docker-image:
     if: github.event.pull_request.merged == false
     runs-on: ubuntu-latest
     steps:
