@@ -1,0 +1,17 @@
+name: Closed Pull Request
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+jobs:
+  removed-docker-image:
+    if: github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove Docker Image from registry
+        run: |
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker rmi docker.io/${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
+          docker logout
