@@ -9,7 +9,7 @@ on:
 jobs:
   # Removing docker image if PR was closed but not merged
   remove-docker-image:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && ${{ github.event.pull_request.merged }} == false
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') && !github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -20,7 +20,7 @@ jobs:
 
   # Deploying both preview and production if it comes from dependabot because there's no need to approve it
   deploy-all:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && ${{ github.event.pull_request.merged }} && ${{ github.event.pull_request.user.login }} == 'dependabot[bot]'
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') && github.event.pull_request.merged && github.event.pull_request.user.login == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -52,7 +52,7 @@ jobs:
 
   # Otherwise deploying only preview with release approval through Slack
   deploy-preview:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && ${{ github.event.pull_request.merged }} == true
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') && github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
