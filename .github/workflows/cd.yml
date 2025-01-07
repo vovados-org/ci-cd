@@ -5,9 +5,52 @@ on:
     branches: [main]
     types: [closed]
 
+# Every job is skipped if PR is labelled "automated-revert"  
 jobs:
+  # Removing docker image if PR was closed but not merged
+  remove-docker-image:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove Docker Image from registry
+        run: |
+          TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKERHUB_USERNAME }}", "password": "${{ secrets.DOCKERHUB_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
+          curl -X DELETE -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ vars.IMAGE_NAME }}/tags/${{ github.event.pull_request.head.sha }}
+
+  # Deploying both preview and production if it comes from dependabot because there's no need to approve it
+  deploy-all:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && github.event.pull_request.merged && github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Replace Docker image with :latest tag
+        run: |
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          # Creating new :latest image based on the :{github.event.pull_request.head.sha} image
+          docker pull ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
+          docker tag ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }} ${{ vars.IMAGE_NAME }}:latest
+          docker push ${{ vars.IMAGE_NAME }}:latest
+          docker logout
+          # Removing :{github.event.pull_request.head.sha} image from Registry
+          TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKERHUB_USERNAME }}", "password": "${{ secrets.DOCKERHUB_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
+          curl -X DELETE -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ vars.IMAGE_NAME }}/tags/${{ github.event.pull_request.head.sha }}
+
+      - name: Deploy preview and production
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            cd ./krustberry.xyz
+            export PREVIEW_IMAGE=${{ vars.IMAGE_NAME }}:latest
+            export PRODUCTION_IMAGE=${{ vars.IMAGE_NAME }}:latest
+            docker compose down preview production
+            docker compose up traefik preview production -d --no-recreate
+
+  # Otherwise deploying only preview with release approval through Slack
   deploy-preview:
-    if: ${{ github.event.pull_request.merged }}
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && ${{ github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy preview version

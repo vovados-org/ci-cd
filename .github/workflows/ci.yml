@@ -7,6 +7,8 @@ on:
 
 jobs:
   test-and-build:
+    # We skip CI and CD if PR is labelled "automated-revert"
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
