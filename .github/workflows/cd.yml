@@ -11,6 +11,7 @@ jobs:
   remove-docker-image:
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && github.event.pull_request.merged == false
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Remove Docker Image from registry
         run: |
@@ -21,6 +22,7 @@ jobs:
   deploy-all:
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && github.event.pull_request.merged && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Replace Docker image with :latest tag
         run: |
@@ -52,6 +54,7 @@ jobs:
   deploy-preview:
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }} && ${{ github.event.pull_request.merged }}
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Deploy preview version
         uses: appleboy/ssh-action@master
@@ -142,3 +145,11 @@ jobs:
                       deny:
                         type: "plain_text"
                         text: "Close"
+
+  always-run:
+    needs: [remove-docker-image, deploy-all, deploy-preview]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Always run
+        run: echo "This step always runs"
