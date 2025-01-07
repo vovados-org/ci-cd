@@ -50,7 +50,7 @@ jobs:
 
   # Otherwise deploying only preview with release approval through Slack
   deploy-preview:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') && github.event.pull_request.merged }}
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') && github.event.pull_request.merged && github.event.pull_request.user.login != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy preview version
