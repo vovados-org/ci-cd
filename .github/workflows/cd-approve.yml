@@ -28,7 +28,7 @@ jobs:
           TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKERHUB_USERNAME }}", "password": "${{ secrets.DOCKERHUB_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
           curl -X DELETE -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ vars.IMAGE_NAME }}/tags/${{ inputs.sha }}
 
-      - name: Deploy production version
+      - name: Deploy production version and redeploy preview with :latest tag
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -37,9 +37,10 @@ jobs:
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
             cd ./krustberry.xyz
+            export PREVIEW_IMAGE=${{ vars.IMAGE_NAME }}:latest
             export PRODUCTION_IMAGE=${{ vars.IMAGE_NAME }}:latest
-            docker compose down production
-            docker compose up traefik production -d --no-recreate
+            docker compose down preview production
+            docker compose up traefik preview production -d --no-recreate
 
       - name: Update Slack notification about successful production deployment
         uses: slackapi/slack-github-action@v2.0.0
