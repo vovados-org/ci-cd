@@ -21,7 +21,7 @@ jobs:
           echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           # Creating new :latest image based on the :{inputs.sha} image
           docker pull ${{ vars.IMAGE_NAME }}:${{ inputs.sha }}
-          docker tag {{ vars.IMAGE_NAME }}:${{ inputs.sha }} ${{ vars.IMAGE_NAME }}:latest
+          docker tag ${{ vars.IMAGE_NAME }}:${{ inputs.sha }} ${{ vars.IMAGE_NAME }}:latest
           docker push ${{ vars.IMAGE_NAME }}:latest
           docker logout
           # Removing :{inputs.sha} image from Registry
