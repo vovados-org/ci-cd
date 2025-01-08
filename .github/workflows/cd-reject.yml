@@ -28,7 +28,7 @@ jobs:
 
       - name: Create revert PR
         run: |
-          # Configure git
+         # Configure git
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
           
@@ -45,12 +45,21 @@ jobs:
           
           # Create PR using GitHub CLI
           gh auth login --with-token <<< "${{ secrets.GH_TOKEN }}"
-          gh pr create \
+          PR_URL=$(gh pr create \
             --base main \
             --head $BRANCH_NAME \
             --title "Revert rejected release ${SHORT_SHA}" \
             --body "Automatically created revert PR for rejected release." \
-            --label "automated-revert"
+            --label "automated-revert" \
+            --json url --jq .url)
+          
+          # Get list of admin users
+          ADMINS=$(gh api /repos/${{ github.repository }}/collaborators --jq '.[] | select(.permissions.admin == true) | .login')
+          
+          # Assign admins to the PR
+          for admin in $ADMINS; do
+            gh pr edit $PR_URL --add-assignee $admin
+          done
 
       - uses: docker/setup-buildx-action@v3
         name: Set up Docker Buildx
