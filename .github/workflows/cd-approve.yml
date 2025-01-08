@@ -37,6 +37,7 @@ jobs:
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
             cd ./krustberry.xyz
+            docker rmi ${{ vars.IMAGE_NAME }}:latest
             export PREVIEW_IMAGE=${{ vars.IMAGE_NAME }}:latest
             export PRODUCTION_IMAGE=${{ vars.IMAGE_NAME }}:latest
             docker compose down preview production
