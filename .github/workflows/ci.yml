@@ -3,12 +3,44 @@ name: CI
 on:
   pull_request:
     branches: [main]
-    types: [opened, reopened, edited]
+    types: [opened, reopened, synchronize]
 
 jobs:
-  test-and-build:
+  test:
     # We skip CI and CD if PR is labelled "automated-revert"
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests and validate code coverage
+        run: pnpm run test:coverage
+
+  build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,21 +60,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run tests and validate code coverage
-        run: pnpm run test:coverage
-
       - name: Build
         run: pnpm run build
 
-      # Cache the build output and node_modules
+      # Cache the build output
       - name: Cache build artifacts
         uses: actions/cache/save@v4
         with:
           path: .next
           key: ${{ runner.os }}-build-${{ github.sha }}
 
-  docker:
-    needs: test-and-build
+  push-docker-image:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
