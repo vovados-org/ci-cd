@@ -49,7 +49,7 @@ jobs:
           method: chat.update
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
-            channel: ${{ secrets.SLACK_CHANNEL_ID }}
+            channel: ${{ vars.SLACK_APPROVAL_CHANNEL_ID }}
             ts: "${{ inputs.ts }}"
             text: "✅ Release has been deployed to production"
 
