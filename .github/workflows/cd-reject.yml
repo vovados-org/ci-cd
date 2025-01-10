@@ -50,8 +50,7 @@ jobs:
             --head $BRANCH_NAME \
             --title "Revert rejected release ${SHORT_SHA}" \
             --body "Automatically created revert PR for rejected release." \
-            --label "automated-revert" \
-            --json url --jq .url)
+            --label "automated-revert")
           
           # Get list of admin users
           ADMINS=$(gh api /repos/${{ github.repository }}/collaborators --jq '.[] | select(.permissions.admin == true) | .login')
