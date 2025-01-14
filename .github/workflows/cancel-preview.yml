@@ -24,8 +24,8 @@ jobs:
             await github.rest.issues.removeLabel({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: ${{ github.repository }},
-              name: 'in-preview'
+              repo: context.repo.name,
+              name: ['in-preview']
             })
 
       - name: Undeploy preview
