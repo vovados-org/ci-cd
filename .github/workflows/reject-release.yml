@@ -45,7 +45,7 @@ jobs:
               issue_number: ${{ inputs.number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: 'in-preview'
+              name: "in-preview"
             })
 
   send-notifications:
@@ -70,5 +70,5 @@ jobs:
               issue_number: ${{ inputs.number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '⛔️ Release rejected. The preview has been undeployed, and the `in-preview` label has been removed.'
+              body: "⛔️ Release rejected. The preview has been undeployed, and the `in-preview` label has been removed."
             })
