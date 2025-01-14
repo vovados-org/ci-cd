@@ -24,7 +24,7 @@ jobs:
             await github.rest.issues.removeLabel({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.name.replace('/', ''),
+              repo: ${{ github.repository }},
               name: 'in-preview'
             })
 
