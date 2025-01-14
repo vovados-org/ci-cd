@@ -55,10 +55,10 @@ jobs:
               pull_number: ${{ inputs.number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              merge_method: "merge"
+              merge_method: 'merge'
             })
 
-      - name: Remove in-preview label
+      - name: Remove in-preview label and add approved label
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -70,11 +70,6 @@ jobs:
               name: 'in-preview'
             })
 
-      - name: Add approved label
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
             await github.rest.issues.addLabel({
               issue_number: ${{ inputs.number }},
               owner: context.repo.owner,
@@ -101,7 +96,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             await github.rest.issues.createComment({
-              issue_number: ${{ inputs.number }},
+              issue_number: Number(${{ inputs.number }}),
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: “✅ The release has been approved and deployed to production. The pull request has been merged, and the preview version has been undeployed.”
