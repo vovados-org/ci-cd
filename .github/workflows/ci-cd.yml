@@ -157,7 +157,7 @@ jobs:
                   - type: "mrkdwn"
                     text: "*UID:*\n${{ github.event.pull_request.head.sha }}"
                   - type: "mrkdwn"
-                    text: "*When:*\n${{ github.event.pull_request.merged_at }}"
+                    text: "*Created at:*\n${{ github.event.pull_request.created_at }}"
               - type: "section"
                 fields:
                   - type: "mrkdwn"
