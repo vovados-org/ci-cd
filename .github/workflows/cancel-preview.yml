@@ -24,7 +24,7 @@ jobs:
             await github.rest.issues.removeLabel({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: 'ci-cd',
+              repo: context.repo.repo,
               name: 'in-preview'
             })
 
@@ -52,6 +52,6 @@ jobs:
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.name,
+              repo: context.repo.repo,
               body: '⛔️ Release rejected. The preview has been undeployed, and the `in-preview` label has been removed.'
             })
