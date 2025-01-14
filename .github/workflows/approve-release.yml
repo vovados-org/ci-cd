@@ -70,11 +70,11 @@ jobs:
               name: 'in-preview'
             })
 
-            await github.rest.issues.addLabel({
+            await github.rest.issues.addLabels({
               issue_number: ${{ inputs.number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: 'approved'
+              name: ['approved']
             })
 
   send-notifications:
@@ -96,7 +96,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             await github.rest.issues.createComment({
-              issue_number: Number(${{ inputs.number }}),
+              issue_number: ${{ inputs.number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: “✅ The release has been approved and deployed to production. The pull request has been merged, and the preview version has been undeployed.”
