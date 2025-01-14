@@ -31,12 +31,11 @@ jobs:
             cd ./krustberry.xyz
             docker compose -p ${{ inputs.sha }} down preview
 
+            # Removing image locally
+            docker images rmi ${{ vars.IMAGE_NAME }}:${{ inputs.sha }}
+
       - name: Remove the image from Docker Registry
         run: |
-          # Removing image locally
-          docker images rmi ${{ vars.IMAGE_NAME }}:${{ inputs.sha }}
-
-          # Removing image from the Registry
           TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKERHUB_USERNAME }}", "password": "${{ secrets.DOCKERHUB_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
           curl -X DELETE -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ vars.IMAGE_NAME }}/tags/${{ inputs.sha }}
 
