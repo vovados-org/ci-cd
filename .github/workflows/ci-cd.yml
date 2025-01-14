@@ -224,5 +224,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ Preview version has been deployed: [${{ github.event.pull_request.head.sha }}.krustberry.xyz](https://${{ github.event.pull_request.head.sha }}.krustberry.xyz)'
+              body: "✅ Preview version has been deployed: [${{ github.event.pull_request.head.sha }}.krustberry.xyz](https://${{ github.event.pull_request.head.sha }}.krustberry.xyz)"
             })
