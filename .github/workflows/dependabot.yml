@@ -1,46 +1,14 @@
-name: CI
+# Action only runs when a PR from Dependabot gets merged
+name: Dependabot (CI/CD)
 
 on:
   pull_request:
     branches: [main]
-    types: [opened, reopened, synchronize]
+    types: [closed]
 
 jobs:
-  test:
-    # We skip CI and CD if PR is labelled "automated-revert"
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'automated-revert') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-
-      - name: Cache Cypress binary
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            cypress-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run tests and validate code coverage
-        run: pnpm run test:coverage
-
   build:
-    needs: test
+    if: github.event.pull_request.merged && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +22,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -70,7 +38,7 @@ jobs:
           path: .next
           key: ${{ runner.os }}-build-${{ github.sha }}
 
-  push-docker-image:
+  create-docker-image:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -106,7 +74,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
+          tags: ${{ vars.IMAGE_NAME }}:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
@@ -114,3 +82,19 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  deploy:
+    needs: create-docker-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to production
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            cd ./krustberry.xyz
+            docker compose -p latest up traefik -d --no-recreate
+            docker compose -p latest up production -d
