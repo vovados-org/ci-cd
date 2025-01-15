@@ -96,5 +96,6 @@ jobs:
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
             cd ./krustberry.xyz
-            docker compose -p latest up traefik -d --no-recreate
-            docker compose -p latest up production -d
+            # Removing :latest image locally so it downloads the new version
+            docker rmi ${{ vars.IMAGE_NAME }}:latest
+            docker compose -p latest up traefik production -d --no-recreate
