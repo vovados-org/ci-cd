@@ -163,7 +163,7 @@ jobs:
                   - type: "mrkdwn"
                     text: "*Created by:*\n<${{ github.event.pull_request.user.html_url }}|@${{ github.event.pull_request.user.login }}>"
                   - type: "mrkdwn"
-                    text: "*Link:*\n<${{ github.event.pull_request.head.sha }}.krustberry.xyz|${{ github.event.pull_request.head.sha }}.krustberry.xyz>"
+                    text: "*Link:*\n<https://${{ github.event.pull_request.head.sha }}.krustberry.xyz|${{ github.event.pull_request.head.sha }}.krustberry.xyz>"
               - type: "divider"
               - type: "rich_text"
                 elements:
