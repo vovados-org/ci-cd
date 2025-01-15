@@ -40,7 +40,7 @@ jobs:
             docker compose -p ${{ github.event.pull_request.head.sha }} down preview
 
             # Removing image locally
-            docker images rmi ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
+            docker rmi ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
 
       - name: Remove the image from Docker Registry
         run: |

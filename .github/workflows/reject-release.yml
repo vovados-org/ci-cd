@@ -32,7 +32,7 @@ jobs:
             docker compose -p ${{ inputs.sha }} down preview
 
             # Removing image locally
-            docker images rmi ${{ vars.IMAGE_NAME }}:${{ inputs.sha }}
+            docker rmi ${{ vars.IMAGE_NAME }}:${{ inputs.sha }}
 
       - name: Remove the image from Docker Registry
         run: |
