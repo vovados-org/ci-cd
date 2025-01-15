@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Remove in-preview label
+        if: contains(github.event.pull_request.labels.*.name, 'in-preview')
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
