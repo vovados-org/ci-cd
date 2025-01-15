@@ -38,15 +38,15 @@ jobs:
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
             cd ./krustberry.xyz
-            docker compose -p ${{ github.event.pull_request.head.sha }} down preview
+            docker compose -p ${{ github.event.pull_request.node_id }} down preview
 
             # Removing image locally
-            docker rmi ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}
+            docker rmi ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.node_id }}
 
       - name: Remove the image from Docker Registry
         run: |
           TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKERHUB_USERNAME }}", "password": "${{ secrets.DOCKERHUB_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
-          curl -X DELETE -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ vars.IMAGE_NAME }}/tags/${{ github.event.pull_request.head.sha }}
+          curl -X DELETE -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ vars.IMAGE_NAME }}/tags/${{ github.event.pull_request.node_id }}
 
       - name: Post comment about canceling preview
         uses: actions/github-script@v7
