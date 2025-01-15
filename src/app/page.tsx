@@ -4,7 +4,7 @@ export default function Home() {
       <button type="button" data-testid="show-result">
         Show result
       </button>
-      <div>New release! Test Revoke123</div>
+      <div>New release! Test Revoke1234444</div>
     </div>
   )
 }
