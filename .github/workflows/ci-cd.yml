@@ -157,13 +157,13 @@ jobs:
                   - type: "mrkdwn"
                     text: "*UID:*\n${{ github.event.pull_request.head.sha }}"
                   - type: "mrkdwn"
-                    text: "*Created at:*\n${{ github.event.pull_request.created_at }}"
+                    text: "*Link:*\n<https://${{ github.event.pull_request.head.sha }}.krustberry.xyz|${{ github.event.pull_request.head.sha }}.krustberry.xyz>"
               - type: "section"
                 fields:
                   - type: "mrkdwn"
                     text: "*Created by:*\n<${{ github.event.pull_request.user.html_url }}|@${{ github.event.pull_request.user.login }}>"
                   - type: "mrkdwn"
-                    text: "*Link:*\n<https://${{ github.event.pull_request.head.sha }}.krustberry.xyz|${{ github.event.pull_request.head.sha }}.krustberry.xyz>"
+                    text: "*Created at:*\n${{ github.event.pull_request.created_at }}"
               - type: "divider"
               - type: "rich_text"
                 elements:
