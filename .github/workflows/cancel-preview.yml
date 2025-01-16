@@ -15,7 +15,6 @@ jobs:
         (github.event.action == 'unlabeled' && !contains(github.event.pull_request.labels.*.name, 'in-preview'))) &&
       github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - name: Get clean node_id
         id: clean_id
@@ -40,6 +39,7 @@ jobs:
 
       - name: Undeploy preview
         uses: appleboy/ssh-action@master
+        continue-on-error: true
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
@@ -53,11 +53,13 @@ jobs:
             docker rmi ${{ vars.IMAGE_NAME }}:${{ steps.clean_id.outputs.clean_id }}
 
       - name: Remove the image from Docker Registry
+        continue-on-error: true
         run: |
           TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKERHUB_USERNAME }}", "password": "${{ secrets.DOCKERHUB_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
           curl -X DELETE -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ vars.IMAGE_NAME }}/tags/${{ steps.clean_id.outputs.clean_id }}
 
       - name: Post comment about canceling preview
+        if: contains(github.event.pull_request.labels.*.name, 'in-preview')
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
