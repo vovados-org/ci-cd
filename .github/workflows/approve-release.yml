@@ -103,11 +103,11 @@ jobs:
               - type: "header"
                 text:
                   type: "plain_text"
-                  text: "New version has been released"
+                  text: "🎉 New version has been released"
               - type: "divider"
               - type: "section"
                 fields:
-                  - type: "mrkdown"
+                  - type: "mrkdwn"
                     text: "*Changes*\n: <${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.html_url }}>"
 
   cleanup-caches:
