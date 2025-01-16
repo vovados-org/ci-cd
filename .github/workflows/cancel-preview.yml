@@ -21,8 +21,8 @@ jobs:
         run: |
           FULL_ID="${{ github.event.pull_request.node_id }}"
           CLEAN_ID=${FULL_ID#PR_}
-          CLEAN_ID_UPPER=$(echo $CLEAN_ID | tr '[:lower:]' '[:upper:]')
-          echo "clean_id=$CLEAN_ID_UPPER" >> $GITHUB_OUTPUT
+          CLEAN_ID_LOWER=$(echo $CLEAN_ID | tr '[:upper:]' '[:lower:]')
+          echo "clean_id=$CLEAN_ID_LOWER" >> $GITHUB_OUTPUT
 
       - name: Remove in-preview label
         if: contains(github.event.pull_request.labels.*.name, 'in-preview')
