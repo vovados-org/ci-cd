@@ -6,11 +6,24 @@ on:
     types: [labeled]
     
 jobs:
-  test:
+  prepare:
     if: |
       !github.event.pull_request.merged &&
       contains(github.event.pull_request.labels.*.name, 'in-preview') &&
       github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    outputs:
+      clean_id: ${{ steps.clean_id.outputs.clean_id }}
+    steps:
+      - name: Get clean node_id
+        id: clean_id
+        run: |
+          FULL_ID="${{ github.event.pull_request.node_id }}"
+          CLEAN_ID=${FULL_ID#PR_}
+          echo "clean_id=$CLEAN_ID" >> $GITHUB_OUTPUT
+  
+  test:
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +55,7 @@ jobs:
         run: pnpm run test:coverage
 
   build:
-    needs: test
+    needs: [prepare, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,10 +83,10 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: .next
-          key: ${{ runner.os }}-build-${{ github.sha }}
+          key: ${{ runner.os }}-build-${{ github.event.pull_request.head.sha }}
 
   create-docker-image:
-    needs: build
+    needs: [prepare, build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -83,7 +96,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .next
-          key: ${{ runner.os }}-build-${{ github.sha }}
+          key: ${{ runner.os }}-build-${{ github.event.pull_request.head.sha }}
           fail-on-cache-miss: true
 
       - name: Set up Docker Buildx
@@ -93,7 +106,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-${{ github.event.pull_request.head.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
 
@@ -108,7 +121,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.IMAGE_NAME }}:${{ github.event.pull_request.node_id }}
+          tags: ${{ vars.IMAGE_NAME }}:${{ needs.prepare.outputs.clean_id }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
@@ -118,7 +131,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   deploy-preview:
-    needs: create-docker-image
+    needs: [prepare, create-docker-image]
     runs-on: ubuntu-latest
     steps:
       - name: Deploy preview version
@@ -130,12 +143,12 @@ jobs:
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
             cd ./krustberry.xyz
-            export PREVIEW_IMAGE=${{ github.event.pull_request.node_id }}
+            export PREVIEW_IMAGE=${{ needs.prepare.outputs.clean_id }}
             docker compose -p latest up traefik -d --no-recreate
-            docker compose -p ${{ github.event.pull_request.node_id }} up preview -d
+            docker compose -p ${{ needs.prepare.outputs.clean_id }} up preview -d
 
   send-notifications:
-    needs: deploy-preview
+    needs: [prepare, deploy-preview]
     runs-on: ubuntu-latest
     steps:
       - name: Send a Slack notification for production approval
@@ -155,9 +168,9 @@ jobs:
               - type: "section"
                 fields:
                   - type: "mrkdwn"
-                    text: "*UID:*\n${{ github.event.pull_request.node_id }}"
+                    text: "*UID:*\n${{ needs.prepare.outputs.clean_id }}"
                   - type: "mrkdwn"
-                    text: "*Link:*\n<https://${{ github.event.pull_request.node_id }}.krustberry.xyz|${{ github.event.pull_request.node_id }}.krustberry.xyz>"
+                    text: "*Link:*\n<https://${{ needs.prepare.outputs.clean_id }}.krustberry.xyz|${{ needs.prepare.outputs.clean_id }}.krustberry.xyz>"
               - type: "section"
                 fields:
                   - type: "mrkdwn"
@@ -178,7 +191,7 @@ jobs:
                       type: "plain_text"
                       text: "Approve"
                     action_id: "approve_production_deploy"
-                    value: "${{ github.event.pull_request.node_id }}/${{ github.event.pull_request.number }}"
+                    value: "${{ needs.prepare.outputs.clean_id }}/${{ github.event.pull_request.number }}"
                     style: "primary"
                     confirm:
                       title:
@@ -198,7 +211,7 @@ jobs:
                       type: "plain_text"
                       text: "Reject"
                     action_id: "reject_production_deploy"
-                    value: "${{ github.event.pull_request.node_id }}/${{ github.event.pull_request.number }}"
+                    value: "${{ needs.prepare.outputs.clean_id }}/${{ github.event.pull_request.number }}"
                     style: "danger"
                     confirm:
                       title:
