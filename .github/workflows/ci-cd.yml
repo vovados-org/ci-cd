@@ -20,7 +20,8 @@ jobs:
         run: |
           FULL_ID="${{ github.event.pull_request.node_id }}"
           CLEAN_ID=${FULL_ID#PR_}
-          echo "clean_id=$CLEAN_ID" >> $GITHUB_OUTPUT
+          CLEAN_ID_UPPER=$(echo $CLEAN_ID | tr '[:lower:]' '[:upper:]')
+          echo "clean_id=$CLEAN_ID_UPPER" >> $GITHUB_OUTPUT
   
   test:
     needs: prepare
