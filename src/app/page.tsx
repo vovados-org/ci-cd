@@ -5,6 +5,7 @@ export default function Home() {
         Show result
       </button>
       <div>New release! Test Revoke123455</div>
+      <div>Some other info</div>
     </div>
   )
 }
