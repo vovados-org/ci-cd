@@ -5,7 +5,7 @@ export default function Home() {
         Show result
       </button>
       <div>New release! Test</div>
-      <div>Some other info1111</div>
+      <div>Some other info1111555</div>
     </div>
   )
 }
