@@ -15,6 +15,7 @@ jobs:
         (github.event.action == 'unlabeled' && !contains(github.event.pull_request.labels.*.name, 'in-preview'))) &&
       github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Get clean node_id
         id: clean_id
