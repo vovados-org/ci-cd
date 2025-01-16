@@ -99,3 +99,37 @@ jobs:
           payload: |
             channel: ${{ vars.SLACK_RELEASES_CHANNEL_ID }}
             text: "🎉 New version has been released."
+            blocks:
+              - type: "header"
+                text:
+                  type: "plain_text"
+                  text: "New version has been released"
+              - type: "divider"
+              - type: "section"
+                fields:
+                  - type: "mrkdown"
+                    text: "*Changes*\n: <${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.html_url }}>"
+
+  cleanup-caches:
+    needs: [deploy, send-notifications]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup PR Caches
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const caches = await github.rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/pull/${context.payload.pull_request.number}/merge`
+            });
+            
+            for (const cache of caches.data.actions_caches) {
+              console.log(`Deleting cache: ${cache.id} (${cache.key})`);
+              await github.rest.actions.deleteActionsCacheById({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                cache_id: cache.id
+              });
+            }
